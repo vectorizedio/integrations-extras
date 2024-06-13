@@ -49,8 +49,16 @@ agents:
     tag: <NEW_TAG>
     repository: <YOUR_PRIVATE_REPOSITORY>/<AGENT_NAME>
 ```
+4. Also make sure to change toleration settings like the following:
+```yaml
+tolerations:
+- key: 'redpanda-node'
+  operator: 'Equal'
+  value: 'true'
+  effect: NoSchedule
+```
 
-4. Use the new `values.yaml` file to upgrade the Agent:
+5. Use the new `values.yaml` file to upgrade the Agent:
 
 ```shell
 helm upgrade -f values.yaml <RELEASE_NAME> datadog/datadog
@@ -107,6 +115,18 @@ By default, collecting logs is disabled in the Datadog Agent. Log collection is 
 For containerized environments, Autodiscovery is configured by default after the Redpanda check integrates in the Datadog Agent image.
 
 Metrics are automatically collected in Datadog's server. For more information, see [Autodiscovery Integration Templates][2].
+
+If you are using a Helm chart add conf resource like:
+
+```yaml
+confd:
+  redpanda.yaml: |-
+    ad_identifiers:
+      - redpanda
+    init_config:
+    instances:
+      - openmetrics_endpoint: http://%%host%%:9644/metrics
+```
 
 ##### Log collection
 
